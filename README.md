@@ -7,7 +7,7 @@ A free, private AI assistant for Windows. The AI runs on your own PC through [Ol
 ## This repo
 
 - `site/` is the website (plain HTML, no build step).
-- `wrangler.jsonc` deploys `site/` as a Cloudflare Worker.
+- `wrangler.jsonc` deploys `site/` to Cloudflare Pages (vega.pages.dev). No build step.
 - **Releases** hold the Windows installer. Every installed copy of Vega checks them and updates itself, so this repo must stay public.
 
 New versions are published from the admin app (JARVIS → Settings → About → Publish Vega).

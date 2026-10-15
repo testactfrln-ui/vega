@@ -1,6 +1,6 @@
 {
-  // Cloudflare Worker that serves the Vega website from the site/ folder.
+  // Cloudflare Pages: serves the Vega website from the site/ folder (no build step).
   "name": "vega",
-  "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./site", "not_found_handling": "404-page" }
+  "pages_build_output_dir": "./site",
+  "compatibility_date": "2026-10-01"
 }
