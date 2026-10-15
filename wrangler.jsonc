@@ -1,0 +1,6 @@
+{
+  // Cloudflare Worker that serves the Vega website from the site/ folder.
+  "name": "vega",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./site", "not_found_handling": "404-page" }
+}
