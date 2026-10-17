@@ -10,6 +10,183 @@
 <meta name="theme-color" content="#04070c">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='none' stroke='%2345d6ff' stroke-width='4' stroke-dasharray='120 60'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%2345d6ff'/%3E%3C/svg%3E">
 <style>
+.observatory {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  min-height: 480px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 52% 53%, rgba(15, 75, 76, 0.32), transparent 36%),
+    radial-gradient(ellipse at 17% 80%, rgba(4, 50, 51, 0.28), transparent 46%),
+    radial-gradient(ellipse at 83% 17%, rgba(8, 42, 45, 0.2), transparent 42%),
+    #001719;
+}
+
+.observatory__atmosphere {
+  position: absolute;
+  z-index: -1;
+  inset: -18%;
+  background:
+    radial-gradient(ellipse at 47% 46%, rgba(75, 179, 178, 0.07), transparent 30%),
+    radial-gradient(ellipse at 61% 54%, rgba(31, 107, 111, 0.09), transparent 39%);
+  filter: blur(34px);
+  pointer-events: none;
+}
+
+.star-renderer {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fallback-star {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: min(78vw, 78vh);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(183, 243, 255, 0.65);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #f4fcff 0 1%, #ddfaff 3%, #a6e8f4 21%, #65c6dd 44%, #24819c 64%, #095064 75%, transparent 78%);
+  box-shadow: 0 0 18px 4px rgba(104, 224, 255, 0.45), 0 0 95px 28px rgba(40, 175, 198, 0.22);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.fallback-star.is-visible {
+  z-index: 0;
+  opacity: 0.92;
+}
+
+.star-renderer.is-hidden {
+  display: none;
+}
+
+.masthead {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  right: clamp(24px, 5.3vw, 84px);
+  left: clamp(24px, 5.3vw, 84px);
+  display: flex;
+  align-items: center;
+  height: 76px;
+  border-bottom: 1px solid rgba(218, 245, 240, 0.12);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+}
+
+.wordmark {
+  color: var(--white);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-decoration: none;
+}
+
+.wordmark span {
+  color: #8ce5ef;
+}
+
+.star-identity {
+  position: absolute;
+  z-index: 2;
+  top: 13.5%;
+  left: clamp(28px, 8vw, 128px);
+  pointer-events: none;
+}
+
+.star-identity__eyebrow {
+  margin: 0 0 13px;
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+}
+
+.star-identity h1 {
+  margin: 0;
+  color: #f3f8f6;
+  font-size: clamp(36px, 4.4vw, 62px);
+  font-weight: 400;
+  letter-spacing: 0.23em;
+  line-height: 1;
+  text-shadow: 0 0 32px rgba(198, 244, 246, 0.14);
+}
+
+.star-identity__constellation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0 0;
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+}
+
+.star-identity__line {
+  display: block;
+  width: 34px;
+  height: 1px;
+  background: rgba(242, 248, 248, 0.82);
+}
+
+.bottom-line {
+  position: absolute;
+  z-index: 2;
+  right: clamp(24px, 5.3vw, 84px);
+  bottom: 0;
+  left: clamp(24px, 5.3vw, 84px);
+  height: 1px;
+  background: rgba(218, 245, 240, 0.24);
+}
+
+@media (max-width: 700px) {
+  .masthead {
+    right: 22px;
+    left: 22px;
+    height: 62px;
+    font-size: 7px;
+  }
+
+  .star-identity {
+    top: 13%;
+    left: 8%;
+  }
+
+  .star-identity h1 {
+    font-size: 43px;
+  }
+
+  .bottom-line {
+    right: 22px;
+    left: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fallback-star {
+    transition: none;
+  }
+}
+
+</style>
+
+<style>
   :root {
     --bg: #04070c; --bg2: #07101a; --panel: rgba(10, 24, 38, 0.72);
     --acc: 69, 214, 255; --cyan: rgb(var(--acc)); --line: rgba(var(--acc), 0.18); --line2: rgba(var(--acc), 0.42);
@@ -147,6 +324,31 @@
 </style>
 </head>
 <body>
+<section class="observatory" aria-label="Vega, the brightest star in the Lyra constellation">
+  <div class="observatory__atmosphere" aria-hidden="true"></div>
+  <div class="fallback-star" id="fallback-star" aria-hidden="true"></div>
+  <canvas
+    class="star-renderer"
+    id="star-renderer"
+    role="img"
+    aria-label="Animated blue-white visualization of Vega with moving plasma, stellar flares, and nearby stars in Lyra"
+  ></canvas>
+
+  <div class="masthead">
+    <a class="wordmark" href="#top" aria-label="Vega home">VEGA<span>.</span></a>
+  </div>
+
+  <div class="star-identity">
+    <p class="star-identity__eyebrow">BRIGHTEST STAR</p>
+    <h1>VEGA</h1>
+    <p class="star-identity__constellation">
+      <span class="star-identity__line" aria-hidden="true"></span>
+      <span>IN THE LYRA CONSTELLATION</span>
+    </p>
+  </div>
+  <div class="bottom-line" aria-hidden="true"></div>
+</section>
+
 <header>
   <div class="wrap">
     <a class="logo" href="#top"><i></i>V.E.G.A.</a>
@@ -334,6 +536,375 @@
   const t = document.getElementById('mockTime');
   const tick = () => { t.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
   tick(); setInterval(tick, 30000);
+</script>
+<script>
+"use strict";
+
+const canvas = document.querySelector("#star-renderer");
+const fallback = document.querySelector("#fallback-star");
+const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+const gl = canvas.getContext("webgl", {
+  alpha: true,
+  antialias: false,
+  depth: false,
+  powerPreference: "high-performance",
+  premultipliedAlpha: false,
+});
+
+const vertexShaderSource = `
+attribute vec2 a_position;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}
+`;
+
+const fragmentShaderSource = `
+precision highp float;
+uniform vec2 u_resolution;
+uniform float u_time;
+const float PI = 3.14159265359;
+
+float hash31(vec3 p) {
+  p = fract(p * 0.1031);
+  p += dot(p, p.yzx + 33.33);
+  return fract((p.x + p.y) * p.z);
+}
+float hash21(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+vec2 lyraPosition(vec2 angularOffset, float minimumRadius, float aspect, float sphereRadius) {
+  float layoutScale = min(1.0, aspect / 1.211);
+  vec2 position = angularOffset * vec2(0.12, 0.07) * layoutScale;
+  float distanceFromVega = length(position);
+  float visibleRadius = max(minimumRadius * layoutScale, sphereRadius + 0.02);
+  if (distanceFromVega < visibleRadius) {
+    position *= visibleRadius / max(distanceFromVega, 0.001);
+  }
+  return position;
+}
+vec3 backgroundStar(vec2 point, vec2 position, float size, float brightness, vec3 tint) {
+  vec2 pixelOffset = (point - position) * u_resolution.y;
+  float distanceSquared = dot(pixelOffset, pixelOffset);
+  float core = exp(-distanceSquared / (size * size));
+  float halo = exp(-distanceSquared / (size * size * 20.0));
+  return tint * brightness * (core + halo * 0.08);
+}
+float noise3(vec3 p) {
+  vec3 i = floor(p);
+  vec3 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash31(i);
+  float b = hash31(i + vec3(1.0, 0.0, 0.0));
+  float c = hash31(i + vec3(0.0, 1.0, 0.0));
+  float d = hash31(i + vec3(1.0, 1.0, 0.0));
+  float e = hash31(i + vec3(0.0, 0.0, 1.0));
+  float f1 = hash31(i + vec3(1.0, 0.0, 1.0));
+  float g = hash31(i + vec3(0.0, 1.0, 1.0));
+  float h = hash31(i + vec3(1.0, 1.0, 1.0));
+  return mix(
+    mix(mix(a, b, f.x), mix(c, d, f.x), f.y),
+    mix(mix(e, f1, f.x), mix(g, h, f.x), f.y),
+    f.z
+  );
+}
+float fbm(vec3 p) {
+  float value = 0.0;
+  float amplitude = 0.5;
+  mat3 rotation = mat3(
+     0.00,  0.80,  0.60,
+    -0.80,  0.36, -0.48,
+    -0.60, -0.48,  0.64
+  );
+  for (int octave = 0; octave < 5; octave++) {
+    value += amplitude * noise3(p);
+    p = rotation * p * 2.02 + vec3(13.1, 7.7, 5.3);
+    amplitude *= 0.5;
+  }
+  return value;
+}
+void main() {
+  vec2 resolution = u_resolution;
+  vec2 pixel = gl_FragCoord.xy;
+  vec2 point = (pixel - resolution * 0.5) / resolution.y;
+  float time = u_time;
+  float radius = min(0.405, 0.445 * resolution.x / resolution.y);
+  vec2 center = vec2(0.08 * resolution.x / resolution.y, 0.015);
+  vec2 spherePoint = point - center;
+  float radialDistance = length(spherePoint);
+  float relativeDistance = radialDistance / radius;
+
+  vec3 color = vec3(0.0015, 0.011, 0.012);
+  vec3 hazeA = vec3(0.018, 0.105, 0.105);
+  float haze = exp(-dot(point - vec2(-0.05, 0.03), point - vec2(-0.05, 0.03)) * 7.5);
+  float haze2 = exp(-dot(point - vec2(0.24, -0.16), point - vec2(0.24, -0.16)) * 13.0);
+  color += hazeA * haze * 0.4 + vec3(0.009, 0.055, 0.066) * haze2 * 0.35;
+
+  vec2 starCell = floor(pixel / 62.0);
+  vec2 starLocal = fract(pixel / 62.0) * 62.0;
+  vec2 starOffset = vec2(hash21(starCell + 8.3), hash21(starCell + 73.1)) * 48.0 + 7.0;
+  float starHash = hash21(starCell + 19.7);
+  float starSize = mix(0.45, 1.0, hash21(starCell + 31.4));
+  float starShape = 1.0 - smoothstep(starSize * 0.45, starSize, length(starLocal - starOffset));
+  float starVisible = step(0.79, starHash);
+  float twinkleAmount = step(0.79, hash21(starCell + 4.2));
+  float twinkle = mix(1.0, 0.94 + 0.06 * sin(time * (0.35 + hash21(starCell) * 0.5) + starHash * 6.28), twinkleAmount);
+  float colorChoice = hash21(starCell + 51.8);
+  vec3 starColor = mix(vec3(0.76, 0.86, 1.0), vec3(1.0, 0.88, 0.72), smoothstep(0.91, 1.0, colorChoice));
+  starColor = mix(starColor, vec3(0.9, 0.96, 1.0), smoothstep(0.35, 0.7, colorChoice));
+  color += starColor * starShape * starVisible * twinkle * (0.12 + starHash * 0.2);
+
+  vec2 epsilonLyrae = center + lyraPosition(vec2(-1.44, 0.89), 0.44, resolution.x / resolution.y, radius);
+  vec2 zetaLyrae = center + lyraPosition(vec2(-1.53, -1.18), 0.5, resolution.x / resolution.y, radius);
+  vec2 deltaLyrae = center + lyraPosition(vec2(-3.47, -1.89), 0.55, resolution.x / resolution.y, radius);
+  vec2 sheliak = center + lyraPosition(vec2(-2.6, -5.42), 0.62, resolution.x / resolution.y, radius);
+  vec2 sulafat = center + lyraPosition(vec2(-4.29, -6.09), 0.72, resolution.x / resolution.y, radius);
+  color += backgroundStar(point, epsilonLyrae + vec2(-0.004, -0.002), 0.75, 0.56, vec3(0.92, 0.96, 1.0));
+  color += backgroundStar(point, epsilonLyrae + vec2(-0.002, 0.002), 0.75, 0.48, vec3(1.0, 0.93, 0.83));
+  color += backgroundStar(point, epsilonLyrae + vec2(0.003, 0.003), 0.75, 0.52, vec3(0.88, 0.94, 1.0));
+  color += backgroundStar(point, epsilonLyrae + vec2(0.005, -0.001), 0.75, 0.44, vec3(1.0, 0.96, 0.88));
+  color += backgroundStar(point, zetaLyrae, 1.05, 0.56, vec3(0.98, 0.96, 0.9));
+  color += backgroundStar(point, deltaLyrae, 1.0, 0.48, vec3(1.0, 0.78, 0.58));
+  color += backgroundStar(point, sheliak, 1.15, 0.64, vec3(0.79, 0.88, 1.0));
+  color += backgroundStar(point, sulafat, 1.2, 0.68, vec3(0.83, 0.91, 1.0));
+
+  float coronaPulse = 0.91 + 0.055 * sin(time * 0.53) + 0.025 * sin(time * 0.91 + 1.7);
+  float coronaAngle = atan(spherePoint.y, spherePoint.x);
+  float coronaNoise = 0.5 + 0.5 * sin(coronaAngle * 13.0 + sin(coronaAngle * 4.0 + time * 0.07) * 1.7 + time * 0.035);
+  float coronaWidth = 0.078 + 0.016 * coronaNoise;
+  float corona = exp(-max(0.0, radialDistance - radius) * (18.0 + coronaNoise * 5.0));
+  color += vec3(0.16, 0.75, 0.83) * corona * coronaPulse * 0.16;
+  color += vec3(0.15, 0.48, 0.59) * exp(-max(0.0, radialDistance - radius) / coronaWidth) * 0.055;
+
+  float limbActivity = 0.0;
+  if (radialDistance > radius * 0.88) {
+    vec3 limbNoisePoint = vec3(cos(coronaAngle) * 11.0, sin(coronaAngle) * 11.0, time * 0.12);
+    float broadLimbNoise = noise3(limbNoisePoint);
+    limbActivity = 0.18 + 0.82 * smoothstep(0.4, 0.76, broadLimbNoise);
+
+    float flareDistance = radialDistance - radius;
+    if (flareDistance > 0.0 && flareDistance < 0.105) {
+      vec3 detailPoint = vec3(
+        cos(coronaAngle) * 22.0 + flareDistance * 36.0,
+        sin(coronaAngle) * 22.0 + flareDistance * 36.0,
+        time * 0.4
+      );
+      float detailNoise = noise3(detailPoint);
+      float reach = 0.004 + pow(smoothstep(0.48, 0.8, broadLimbNoise), 2.8) * 0.036;
+      float flareEnvelope = exp(-pow(flareDistance / max(reach * 0.72, 0.001), 2.0));
+      float connectedBase = exp(-flareDistance / (0.004 + limbActivity * 0.004));
+      float turbulentStrands = 0.2 + 0.8 * smoothstep(0.48, 0.8, detailNoise);
+      float flareGlow = flareEnvelope * limbActivity * turbulentStrands + connectedBase * limbActivity * 0.1;
+      color += vec3(0.13, 0.56, 0.74) * flareGlow * 0.34;
+      color += vec3(0.78, 0.94, 1.0) * flareGlow * flareGlow * 0.3;
+    }
+  }
+
+  if (relativeDistance < 1.0) {
+    float frontDepth = sqrt(max(0.0, 1.0 - relativeDistance * relativeDistance));
+    vec3 normal = normalize(vec3(spherePoint / radius, frontDepth));
+    float rotation = time * 0.018;
+    float cs = cos(rotation);
+    float sn = sin(rotation);
+    normal.xz = mat2(cs, -sn, sn, cs) * normal.xz;
+    vec3 position = normal * 2.7;
+    vec3 slowFlow = vec3(time * 0.018, -time * 0.011, time * 0.009);
+    float warpA = fbm(position * 1.8 + slowFlow);
+    float warpB = fbm(position * 2.1 - slowFlow * 0.72 + vec3(8.4, 2.7, 4.1));
+    vec3 warped = position * 4.2 + vec3(warpA, warpB, warpA - warpB) * 1.5;
+    float broad = fbm(warped + slowFlow * 1.7);
+    float medium = fbm(warped * 2.35 - slowFlow * 2.2 + vec3(3.0, 7.0, 1.0));
+    float fine = fbm(warped * 6.8 + vec3(-time * 0.07, time * 0.055, time * 0.035));
+    float filamentSource = noise3(warped * 10.4 + vec3(time * 0.028, -time * 0.021, time * 0.018));
+    float filaments = pow(max(0.0, 1.0 - abs(filamentSource * 2.0 - 1.0)), 5.0);
+    float cells = smoothstep(0.35, 0.77, broad * 0.53 + medium * 0.47);
+    float activity = broad * 0.42 + medium * 0.36 + fine * 0.22;
+
+    vec3 deepBlue = vec3(0.035, 0.27, 0.39);
+    vec3 cyan = vec3(0.22, 0.71, 0.82);
+    vec3 ice = vec3(0.66, 0.91, 0.96);
+    vec3 stellarWhite = vec3(0.95, 0.99, 1.0);
+    vec3 surface = mix(deepBlue, cyan, smoothstep(0.2, 0.72, activity));
+    surface = mix(surface, ice, smoothstep(0.48, 0.76, activity + filaments * 0.2));
+    surface = mix(surface, stellarWhite, smoothstep(0.68, 0.88, activity + filaments * 0.28) * 0.68);
+    surface += vec3(0.06, 0.23, 0.3) * filaments * (0.25 + broad * 0.75);
+
+    float limb = pow(1.0 - frontDepth, 2.4);
+    float limbLight = smoothstep(0.76, 1.0, relativeDistance);
+    float faceLight = 0.76 + 0.24 * max(0.0, dot(normal, normalize(vec3(-0.24, 0.2, 0.95))));
+    float surfaceFlicker = 0.97 + 0.035 * sin(time * 0.85 + broad * 8.0 + medium * 4.0);
+    surface *= faceLight * surfaceFlicker;
+    surface += vec3(0.16, 0.65, 0.76) * (limb * 0.26 + limbLight * 0.32);
+    surface += vec3(0.28, 0.74, 0.83) * limbActivity * limbLight * 0.12;
+    surface *= 0.84 + cells * 0.24;
+    color = surface;
+    float edge = 1.0 - smoothstep(0.997, 1.0, relativeDistance);
+    color *= edge;
+    float rim = exp(-pow((1.0 - relativeDistance) * 43.0, 2.0));
+    color += vec3(0.54, 0.93, 1.0) * rim * coronaPulse * 0.65;
+  }
+
+  float vignette = 1.0 - smoothstep(0.46, 0.86, length(point)) * 0.34;
+  color *= vignette;
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
+let program = null;
+let vertexBuffer = null;
+let resolutionLocation = null;
+let timeLocation = null;
+let frameRequest = 0;
+let resizeObserver = null;
+let startTime = performance.now();
+let isRunning = false;
+
+function compileShader(type, source) {
+  const shader = gl.createShader(type);
+  if (!shader) throw new Error("Unable to create a WebGL shader.");
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    const message = gl.getShaderInfoLog(shader) || "Unknown shader compilation error.";
+    gl.deleteShader(shader);
+    throw new Error(message);
+  }
+  return shader;
+}
+
+function initializeRenderer() {
+  const vertexShader = compileShader(gl.VERTEX_SHADER, vertexShaderSource);
+  const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
+  program = gl.createProgram();
+  if (!program) throw new Error("Unable to create the WebGL program.");
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  gl.deleteShader(vertexShader);
+  gl.deleteShader(fragmentShader);
+
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    const message = gl.getProgramInfoLog(program) || "Unknown WebGL program link error.";
+    gl.deleteProgram(program);
+    program = null;
+    throw new Error(message);
+  }
+
+  vertexBuffer = gl.createBuffer();
+  if (!vertexBuffer) throw new Error("Unable to create the WebGL vertex buffer.");
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+  gl.useProgram(program);
+  const positionLocation = gl.getAttribLocation(program, "a_position");
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+  resolutionLocation = gl.getUniformLocation(program, "u_resolution");
+  timeLocation = gl.getUniformLocation(program, "u_time");
+  gl.clearColor(0, 0, 0, 0);
+  resizeCanvas();
+}
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5, 1920 / rect.width, 1200 / rect.height);
+  const width = Math.max(1, Math.round(rect.width * pixelRatio));
+  const height = Math.max(1, Math.round(rect.height * pixelRatio));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+  if (gl && program) {
+    gl.viewport(0, 0, width, height);
+    gl.useProgram(program);
+    gl.uniform2f(resolutionLocation, width, height);
+  }
+}
+
+function render(now) {
+  if (!isRunning || document.hidden) return;
+  const elapsed = motionPreference.matches ? 0 : (now - startTime) * 0.001;
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.useProgram(program);
+  gl.uniform1f(timeLocation, elapsed);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  if (motionPreference.matches) {
+    isRunning = false;
+    return;
+  }
+  frameRequest = window.requestAnimationFrame(render);
+}
+
+function start() {
+  if (isRunning || document.hidden || !program) return;
+  isRunning = true;
+  frameRequest = window.requestAnimationFrame(render);
+}
+
+function stop() {
+  isRunning = false;
+  window.cancelAnimationFrame(frameRequest);
+}
+
+function showFallback(error) {
+  stop();
+  canvas.classList.add("is-hidden");
+  fallback.classList.add("is-visible");
+  if (error) console.error("VEGA WebGL renderer could not start; showing the CSS fallback.", error);
+}
+
+if (!gl) {
+  showFallback(new Error("WebGL is unavailable in this browser."));
+} else {
+  try {
+    initializeRenderer();
+    fallback.classList.remove("is-visible");
+    if ("ResizeObserver" in window) {
+      resizeObserver = new ResizeObserver(resizeCanvas);
+      resizeObserver.observe(canvas);
+    } else {
+      window.addEventListener("resize", resizeCanvas);
+    }
+    start();
+  } catch (error) {
+    showFallback(error);
+  }
+
+  canvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    showFallback(new Error("The WebGL context was lost."));
+  });
+
+  canvas.addEventListener("webglcontextrestored", () => {
+    try {
+      initializeRenderer();
+      canvas.classList.remove("is-hidden");
+      fallback.classList.remove("is-visible");
+      start();
+    } catch (error) {
+      showFallback(error);
+    }
+  });
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) stop();
+  else start();
+});
+
+motionPreference.addEventListener("change", () => {
+  if (!document.hidden) {
+    startTime = performance.now();
+    if (!isRunning) start();
+  }
+});
+
+window.addEventListener("pagehide", () => {
+  stop();
+  if (resizeObserver) resizeObserver.disconnect();
+  if (gl && program) gl.deleteProgram(program);
+  if (gl && vertexBuffer) gl.deleteBuffer(vertexBuffer);
+}, { once: true });
 </script>
 </body>
 </html>
